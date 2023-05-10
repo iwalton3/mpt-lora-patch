@@ -4,6 +4,8 @@ This is the Python model code for MPT-7B patched so that it can be used with a L
 
 Note that when using LoRA, there is a strange quirk that prevents me from causing generation with an empty prompt.
 
+I also included a model-agnostic `export_hf_checkpoint.py` script, which you can use to merge your lora back into a new full model. Once you do this, you do not need to use the patched version of the model code anymore. That being said, if you want to be able to load the model in 8bit you will still need it. The usage is `python export_hf_checkpoint.py <source> <lora> <dest>`.
+
 If you would like to use this with `text-generation-webui`, apply the following patch:
 
 ```patch
