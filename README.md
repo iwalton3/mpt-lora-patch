@@ -29,6 +29,12 @@ index 278291c..d3ad18c 100644
  WANT_INTERRUPT = False
 ```
 
+You will need to run the webui with these options:
+
+```bash
+python server.py --model mosaicml_mpt-7b-instruct --trust-remote-code --load-in-8bit
+```
+
 You can find the source model here: [mosaicml/mpt-7b-instruct](https://huggingface.co/mosaicml/mpt-7b-instruct)
 
 The alterations are based on the [source code for the llama model](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py) from HF Transformers.
