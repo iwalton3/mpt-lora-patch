@@ -7,8 +7,6 @@ Note that when using LoRA, there is a strange quirk that prevents me from causin
 If you would like to use this with `text-generation-webui`, apply the following patch:
 
 ```patch
-diff --git a/modules/training.py b/modules/training.py
-index 278291c..d3ad18c 100644
 --- a/modules/training.py
 +++ b/modules/training.py
 @@ -28,12 +28,13 @@ try:
@@ -34,6 +32,30 @@ You will need to run the webui with these options:
 ```bash
 python server.py --model mosaicml_mpt-7b-instruct --trust-remote-code --load-in-8bit
 ```
+
+You may also need to patch `bitsandbytes/nn/modules.py` to prevent running out of VRAM when saving the LoRA:
+
+```patch
+--- a/modules.py
++++ b/modules.py
+@@ -259,13 +259,13 @@
+         if not self.state.has_fp16_weights and self.state.CB is None and self.state.CxB is not None:
+             # reorder weight layout back from ampere/turing to row
+             reorder_layout = True
+-            weight_clone = self.weight.data.clone()
++            weight_clone = self.weight.data
+         else:
+             reorder_layout = False
+
+         try:
+             if reorder_layout:
+-                self.weight.data = undo_layout(self.state.CxB, self.state.tile_indices)
++                self.weight.data = undo_layout(self.state.CxB.cpu(), self.state.tile_indices.cpu())
+
+             super()._save_to_state_dict(destination, prefix, keep_vars)
+```
+
+(It resides in `miniconda3/envs/textgen/lib/python3.10/site-packages/bitsandbytes/nn/modules.py` for me.)
 
 You can find the source model here: [mosaicml/mpt-7b-instruct](https://huggingface.co/mosaicml/mpt-7b-instruct)
 
