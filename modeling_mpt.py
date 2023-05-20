@@ -159,8 +159,12 @@ class MPTModel(MPTPreTrainedModel):
         if attention_mask is not None:
             attention_mask = attention_mask.bool()
         else:
+            if input_ids is not None:
+                device = input_ids.device
+            else:
+                device = inputs_embeds.device
             attention_mask = torch.ones(
-                (batch_size, seq_length_with_past), dtype=torch.bool, device=inputs_embeds.device
+                (batch_size, seq_length_with_past), dtype=torch.bool, device=device
             )
 
         if inputs_embeds is None:
